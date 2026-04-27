@@ -1,6 +1,6 @@
 # Mala LLM Gateway
 
-Mala is a high-performance, enterprise-grade LLM Gateway built with Go and Fiber. it serves as a secure, unified entry point for multiple LLM providers (OpenAI, Anthropic, Gemini) with built-in budget management, security scrubbing, and detailed analytics.
+Mala is a high-performance, enterprise-grade LLM Gateway built with Go and Fiber. It serves as a secure, unified entry point for multiple LLM providers (OpenAI, Anthropic, Gemini) with built-in budget management, security scrubbing, and detailed analytics.
 
 ## Tech Stack
 
@@ -23,6 +23,25 @@ Mala is a high-performance, enterprise-grade LLM Gateway built with Go and Fiber
     - **Key Management**: Create and manage virtual keys with specific budgets.
     - **Provider Health**: Monitor uptime of upstream LLM providers.
     - **Analytics**: Cost tracking and usage history.
+
+## How It Works
+
+Mala operates as a transparent proxy between your internal applications and external LLM providers. Here is the lifecycle of a request:
+
+### 1. Request Flow (The Security Chain)
+Every request to the Data Plane (`/v1/*`) passes through a rigorous middleware chain:
+1.  **IP Filtering**: Ensures the request comes from an authorized internal server IP.
+2.  **Virtual Key Validation**: Validates the `Authorization` bearer token against the database.
+3.  **Budget Guard**: Checks if the key has enough remaining budget. If the balance is ≤ 0, it returns `402 Payment Required`.
+4.  **Rate Limiter**: Enforces Request-Per-Minute (RPM) limits to prevent accidental resource exhaustion.
+5.  **PII Scrubber**: Scans the request body (prompt) for sensitive information (Emails, Phone Numbers, NIK) and redacts them using regex patterns.
+6.  **Provider Setup**: Identifies the correct upstream provider for the requested model and decrypts the real API key.
+
+### 2. Execution & Logging
+- The handler forwards the (scrubbed) request to the upstream provider (e.g., OpenAI).
+- Once the response is received, Mala parses the token usage.
+- **Asynchronous Logging**: Mala calculates the cost based on the model's price and records the transaction in `usage_logs` without blocking the client response.
+- The virtual key's `spent_amount` is updated in real-time.
 
 ## Getting Started
 

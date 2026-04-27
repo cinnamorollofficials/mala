@@ -1,34 +1,48 @@
 # Mala LLM Gateway
 
-Mala is a high-performance LLM Gateway built with Go, using the Fiber web framework and PostgreSQL. It serves as a unified entry point for interacting with multiple Large Language Models while providing centralized management, logging, and security.
+Mala is a high-performance, enterprise-grade LLM Gateway built with Go and Fiber. it serves as a secure, unified entry point for multiple LLM providers (OpenAI, Anthropic, Gemini) with built-in budget management, security scrubbing, and detailed analytics.
 
 ## Tech Stack
 
 - **Language**: [Go (Golang)](https://go.dev/)
 - **Web Framework**: [Fiber v2](https://gofiber.io/)
-- **Database Driver**: [pgx v5](https://github.com/jackc/pgx)
+- **Database**: [PostgreSQL](https://www.postgresql.org/) with [pgx v5](https://github.com/jackc/pgx)
 - **Query Builder**: [Squirrel](https://github.com/Masterminds/squirrel)
-- **Environment Management**: [godotenv](https://github.com/joho/godotenv)
+- **Security**: AES-256 for API key encryption
 
-## Prerequisites
+## Core Features
 
-- Go 1.21 or higher
-- PostgreSQL
-- Make (optional, but recommended)
+- **Data Plane (OpenAI-Compatible)**: Drop-in replacement for OpenAI endpoints.
+- **Security Chain**:
+    - **IP Whitelisting**: Restrict access to trusted internal servers.
+    - **Virtual Key Auth**: Manage internal access with virtual keys.
+    - **Budget Guard**: Real-time spending enforcement and auto-blocking.
+    - **Rate Limiting**: Per-key request throttling.
+    - **PII Scrubber**: Automated redaction of sensitive data (Email, NIK, Phone) before sending to providers.
+- **Control Plane (Admin)**:
+    - **Key Management**: Create and manage virtual keys with specific budgets.
+    - **Provider Health**: Monitor uptime of upstream LLM providers.
+    - **Analytics**: Cost tracking and usage history.
 
 ## Getting Started
 
-### 1. Clone the repository
+### 1. Prerequisites
+
+- Go 1.21+
+- PostgreSQL
+- Make
+
+### 2. Installation
 
 ```bash
 git clone git@github.com:cinnamorollofficials/mala.git
 cd mala
+go mod tidy
 ```
 
-### 2. Configure environment variables
+### 3. Configuration
 
-Create a `.env` file in the root directory (you can use the existing one as a template):
-
+Create a `.env` file from the example:
 ```env
 DB_HOST=localhost
 DB_PORT=5432
@@ -38,70 +52,59 @@ DB_NAME=mala_db
 DB_SSLMODE=disable
 
 PORT=3000
+ENCRYPTION_KEY=your-32-char-encryption-key
+ALLOWED_IPS=127.0.0.1,::1
 ```
 
-### 3. Install dependencies
+### 4. Database Initialization
 
-```bash
-go mod tidy
-```
-
-### 4. Database Setup
-
-Ensure you have created the database specified in your `.env` file:
-
-```sql
-CREATE DATABASE mala_db;
-```
+Run the migration found in `database/migrations/000001_init_schema.up.sql` against your PostgreSQL instance.
 
 ## Running the Application
 
-Using **Make**:
-
 ```bash
-# Run the application
+# Run in development mode
 make run
 
-# Build the binary
+# Build production binary
 make build
-
-# Run tests
-make test
 ```
 
-Without **Make**:
+## API Reference
 
-```bash
-go run main.go
-```
+### Data Plane (OpenAI-Compatible)
+Requires `Authorization: Bearer <VIRTUAL_KEY>`
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/v1/chat/completions` | Proxy chat requests to configured providers |
+| `GET` | `/v1/models` | List active models available to the key |
+
+### Control Plane (Admin)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/admin/keys` | Create a new Virtual Key |
+| `GET` | `/admin/keys` | List all Virtual Keys and budgets |
+| `PATCH` | `/admin/keys/:id/topup` | Add budget to a key |
+| `POST` | `/admin/providers` | Configure a new LLM Provider |
+| `GET` | `/admin/usage/summary` | Get total cost analytics for today |
 
 ## Project Structure
 
 ```text
 mala/
-├── cmd/                # Entry points for the application
-├── internal/           # Private application and library code
-│   ├── handlers/       # HTTP request handlers
-│   ├── models/         # Database models and DTOs
-│   ├── routes/         # Route definitions
-│   └── service/        # Business logic
-├── pkg/                # Public library code (can be used by other projects)
-│   └── database/       # Database connection and utilities
-├── .env                # Environment variables (git-ignored)
-├── .gitignore          # Git ignore rules
-├── Makefile            # Build and development commands
+├── database/migrations # SQL migration files
+├── internal/
+│   ├── handlers/       # Data & Control plane handlers
+│   ├── middleware/     # Security chain (Auth, PII, Budget, etc.)
+│   ├── models/         # Go entities (GORM/SQL compatible)
+│   └── routes/         # Router orchestration
+├── pkg/
+│   ├── database/       # DB connection pool
+│   └── utils/          # Encryption & helpers
 └── main.go             # Application entry point
 ```
-
-## API Endpoints
-
-| Method | Endpoint      | Description                           |
-| :----- | :------------ | :------------------------------------ |
-| `GET`  | `/api/health` | Check application and database status |
-
-## Author
-
-Initial project by [cinnamorollofficials](https://github.com/cinnamorollofficials)
 
 ## License
 

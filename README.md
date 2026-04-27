@@ -43,16 +43,70 @@ Every request to the Data Plane (`/v1/*`) passes through a rigorous middleware c
 - **Asynchronous Logging**: Mala calculates the cost based on the model's price and records the transaction in `usage_logs` without blocking the client response.
 - The virtual key's `spent_amount` is updated in real-time.
 
+## API Reference & Endpoint Details
+
+### 1. Data Plane (AI Transactions)
+These endpoints are OpenAI-compatible and require a `Virtual Key` in the `Authorization: Bearer <key>` header.
+
+#### `POST /v1/chat/completions`
+- **Function**: The main endpoint for chat-based AI interactions. 
+- **Process**: Validates key -> Scrubs PII -> Selects Provider -> Proxies request -> Calculates cost -> Logs usage.
+- **Compatibility**: Supports standard OpenAI request bodies.
+
+#### `GET /v1/models`
+- **Function**: Lists all available and active models that the current Virtual Key is permitted to use.
+- **Response**: Returns a JSON list of models with their provider information.
+
+#### `POST /v1/embeddings`
+- **Function**: Used for generating vector embeddings for RAG (Retrieval-Augmented Generation) workflows.
+- **Status**: Currently implemented as a placeholder.
+
+---
+
+### 2. Control Plane (Management)
+These endpoints are used by administrators to manage the system and monitor costs.
+
+#### `POST /admin/keys`
+- **Function**: Issues a new Virtual Key for an internal team or application.
+- **Input**: `name`, `total_budget` (USD), and `expires_in_days`.
+- **Output**: Returns the unique `sk-gh-xxx` key.
+
+#### `GET /admin/keys`
+- **Function**: Retrieves a list of all active virtual keys, their allocated budgets, and current spending.
+
+#### `PATCH /admin/keys/:id/topup`
+- **Function**: Adds additional budget (USD) to an existing Virtual Key.
+- **Use Case**: When a team hits their budget limit and needs more credits.
+
+#### `POST /admin/providers`
+- **Function**: Registers a new LLM vendor (OpenAI, Gemini, etc.) in the system.
+- **Detail**: The API Key provided here is automatically encrypted using AES-256 before being stored in the database.
+
+#### `POST /admin/models`
+- **Function**: Configures a specific AI model (e.g., `gpt-4o`) and links it to a provider.
+- **Detail**: Set input and output pricing here for automatic cost calculation.
+
+#### `GET /admin/models`
+- **Function**: Lists all configured models with their associated providers and pricing details.
+
+#### `PUT /admin/models/:id`
+- **Function**: Updates model pricing or active status.
+
+#### `GET /admin/usage/summary`
+- **Function**: Provides a high-level analytics dashboard for the current day.
+- **Metric**: Returns the total USD spent across all virtual keys today.
+
+#### `GET /api/health`
+- **Function**: Basic system health check. Verifies connectivity to the PostgreSQL database.
+
 ## Getting Started
 
 ### 1. Prerequisites
-
 - Go 1.21+
 - PostgreSQL
 - Make
 
 ### 2. Installation
-
 ```bash
 git clone git@github.com:cinnamorollofficials/mala.git
 cd mala
@@ -60,7 +114,6 @@ go mod tidy
 ```
 
 ### 3. Configuration
-
 Create a `.env` file from the example:
 ```env
 DB_HOST=localhost
@@ -76,55 +129,22 @@ ALLOWED_IPS=127.0.0.1,::1
 ```
 
 ### 4. Database Initialization
-
-Run the migration found in `database/migrations/000001_init_schema.up.sql` against your PostgreSQL instance.
+Run the migration:
+```bash
+psql mala_db < database/migrations/000001_init_schema.up.sql
+```
 
 ## Running the Application
-
 ```bash
 # Run in development mode
 make run
 
 # Build production binary
 make build
-```
 
-## API Reference
-
-### Data Plane (OpenAI-Compatible)
-Requires `Authorization: Bearer <VIRTUAL_KEY>`
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/v1/chat/completions` | Proxy chat requests to configured providers |
-| `GET` | `/v1/models` | List active models available to the key |
-
-### Control Plane (Admin)
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/admin/keys` | Create a new Virtual Key |
-| `GET` | `/admin/keys` | List all Virtual Keys and budgets |
-| `PATCH` | `/admin/keys/:id/topup` | Add budget to a key |
-| `POST` | `/admin/providers` | Configure a new LLM Provider |
-| `GET` | `/admin/usage/summary` | Get total cost analytics for today |
-
-## Project Structure
-
-```text
-mala/
-├── database/migrations # SQL migration files
-├── internal/
-│   ├── handlers/       # Data & Control plane handlers
-│   ├── middleware/     # Security chain (Auth, PII, Budget, etc.)
-│   ├── models/         # Go entities (GORM/SQL compatible)
-│   └── routes/         # Router orchestration
-├── pkg/
-│   ├── database/       # DB connection pool
-│   └── utils/          # Encryption & helpers
-└── main.go             # Application entry point
+# Run performance test
+make perf-test
 ```
 
 ## License
-
 [MIT](LICENSE)

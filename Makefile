@@ -12,3 +12,6 @@ test:
 
 clean:
 	rm -rf bin/
+
+perf-test:
+	go run scripts/perf_test.go

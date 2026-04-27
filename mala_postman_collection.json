@@ -1,0 +1,287 @@
+{
+	"info": {
+		"_postman_id": "9e77ef28-1f2e-4cfe-92a3-60e37e969046",
+		"name": "Mala LLM Gateway",
+		"description": "Postman Collection for Mala LLM Gateway APIs (Data Plane & Control Plane)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Data Plane (v1)",
+			"item": [
+				{
+					"name": "Chat Completions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{virtual_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"model\": \"gpt-4o\",\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Halo, siapa namamu?\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/chat/completions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"chat",
+								"completions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Models",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{virtual_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/models",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"models"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Embeddings",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{virtual_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"model\": \"text-embedding-3-small\",\n    \"input\": \"The food was delicious and the service was excellent.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/embeddings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"embeddings"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Control Plane (Admin)",
+			"item": [
+				{
+					"name": "Create Virtual Key",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Internal Tim Dev\",\n    \"total_budget\": 50.0,\n    \"expires_in_days\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/keys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Virtual Keys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/keys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Topup Virtual Key",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 100.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/keys/:id/topup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"keys",
+								":id",
+								"topup"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "uuid-here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Provider",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"OpenAI Production\",\n    \"provider_type\": \"openai\",\n    \"api_key\": \"sk-proj-xxxx\",\n    \"base_url\": \"https://api.openai.com/v1\",\n    \"priority\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/providers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"providers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usage Summary Today",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/usage/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"usage",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "virtual_key",
+			"value": "sk-gh-xxxx",
+			"type": "string"
+		}
+	]
+}

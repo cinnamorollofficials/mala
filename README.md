@@ -164,5 +164,13 @@ make docker-down
 > [!TIP]
 > On the first run, Docker will automatically execute the database migrations found in `database/migrations/`.
 
+## Future Roadmap / TODO
+
+- [ ] **HashiCorp Vault Integration**: Transition API key storage from Postgres to Vault for enterprise-grade security.
+- [ ] **Advanced Analytics**: Detailed token usage graphs and monthly billing reports.
+- [ ] **User Authentication**: Add JWT-based auth for the Control Plane (Admin) endpoints.
+- [ ] **Streaming Support**: Implement Server-Sent Events (SSE) for chat completions.
+- [ ] **Provider Fallback**: Automatically switch providers if the primary one returns a 5xx error.
+
 ## License
 [MIT](LICENSE)

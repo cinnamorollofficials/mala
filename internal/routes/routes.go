@@ -45,6 +45,7 @@ func SetupRoutes(app *fiber.App) {
 
 	// Admin Providers
 	admin.Post("/providers", handlers.CreateProvider)
+	admin.Get("/providers", handlers.ListProviders)
 	admin.Get("/providers/health", handlers.ProvidersHealth)
 
 	// Admin Models

@@ -106,130 +106,291 @@
 			"name": "Control Plane (Admin)",
 			"item": [
 				{
-					"name": "Create Virtual Key",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Internal Tim Dev\",\n    \"total_budget\": 50.0,\n    \"expires_in_days\": 30\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "Keys",
+					"item": [
+						{
+							"name": "Create Virtual Key",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Internal Tim Dev\",\n    \"total_budget\": 50.0,\n    \"expires_in_days\": 30\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/keys",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"keys"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/admin/keys",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"admin",
-								"keys"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List Virtual Keys",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/admin/keys",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"admin",
-								"keys"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Topup Virtual Key",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"amount\": 100.0\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "List Virtual Keys",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/keys",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"keys"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/admin/keys/:id/topup",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"admin",
-								"keys",
-								":id",
-								"topup"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "uuid-here"
+						{
+							"name": "Topup Virtual Key",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amount\": 100.0\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/keys/:id/topup",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"keys",
+										":id",
+										"topup"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "uuid-here"
+										}
+									]
 								}
-							]
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Create Provider",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"OpenAI Production\",\n    \"provider_type\": \"openai\",\n    \"api_key\": \"sk-proj-xxxx\",\n    \"base_url\": \"https://api.openai.com/v1\",\n    \"priority\": 1\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "Providers",
+					"item": [
+						{
+							"name": "Create Provider",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"OpenAI Production\",\n    \"provider_type\": \"openai\",\n    \"api_key\": \"sk-proj-xxxx\",\n    \"base_url\": \"https://api.openai.com/v1\",\n    \"priority\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/providers",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"providers"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/admin/providers",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"admin",
-								"providers"
-							]
+						{
+							"name": "List Providers (Admin)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/providers",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"providers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Providers Health",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/providers/health",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"providers",
+										"health"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Usage Summary Today",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/admin/usage/summary",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"admin",
-								"usage",
-								"summary"
-							]
+					"name": "Models",
+					"item": [
+						{
+							"name": "Create Model",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"provider_id\": \"uuid-provider-here\",\n    \"model_name\": \"gpt-4o\",\n    \"input_price_per_1k\": 0.005,\n    \"output_price_per_1k\": 0.015\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/models",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"models"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Models (Admin)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/models",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"models"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Model",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"input_price_per_1k\": 0.004,\n    \"output_price_per_1k\": 0.012,\n    \"is_active\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/models/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"models",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "uuid-here"
+										}
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
+				},
+				{
+					"name": "Analytics",
+					"item": [
+						{
+							"name": "Usage Summary Today",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/usage/summary",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"usage",
+										"summary"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Key Usage History",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/usage/:key_id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"usage",
+										":key_id"
+									],
+									"variable": [
+										{
+											"key": "key_id",
+											"value": "uuid-here"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		},

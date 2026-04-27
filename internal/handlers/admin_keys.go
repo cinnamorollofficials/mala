@@ -49,7 +49,7 @@ func CreateVirtualKey(c *fiber.Ctx) error {
 
 func ListVirtualKeys(c *fiber.Ctx) error {
 	rows, err := database.DB.Query(context.Background(), 
-		"SELECT id, key_value, name, total_budget, spent_amount, is_active, expires_at FROM virtual_keys")
+		"SELECT id, key_value, name, total_budget, spent_amount, expires_at, is_active, created_at, updated_at FROM virtual_keys")
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -58,7 +58,7 @@ func ListVirtualKeys(c *fiber.Ctx) error {
 	keys := []models.VirtualKey{}
 	for rows.Next() {
 		var k models.VirtualKey
-		err := rows.Scan(&k.ID, &k.KeyValue, &k.Name, &k.TotalBudget, &k.SpentAmount, &k.IsActive, &k.ExpiresAt)
+		err := rows.Scan(&k.ID, &k.KeyValue, &k.Name, &k.TotalBudget, &k.SpentAmount, &k.ExpiresAt, &k.IsActive, &k.CreatedAt, &k.UpdatedAt)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}

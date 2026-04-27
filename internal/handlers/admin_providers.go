@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/hadigunawan/mala/internal/models"
 	"github.com/hadigunawan/mala/pkg/database"
 	"github.com/hadigunawan/mala/pkg/utils"
 )
@@ -44,6 +45,27 @@ func CreateProvider(c *fiber.Ctx) error {
 		"id":   id,
 		"name": req.Name,
 	})
+}
+
+func ListProviders(c *fiber.Ctx) error {
+	rows, err := database.DB.Query(context.Background(), 
+		"SELECT id, name, provider_type, api_key, base_url, is_active, priority, created_at, updated_at FROM providers")
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	defer rows.Close()
+
+	providers := []models.Provider{}
+	for rows.Next() {
+		var p models.Provider
+		err := rows.Scan(&p.ID, &p.Name, &p.ProviderType, &p.APIKey, &p.BaseURL, &p.IsActive, &p.Priority, &p.CreatedAt, &p.UpdatedAt)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+		providers = append(providers, p)
+	}
+
+	return c.JSON(providers)
 }
 
 func ProvidersHealth(c *fiber.Ctx) error {

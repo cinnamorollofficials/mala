@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/hadigunawan/mala/internal/models"
 	"github.com/hadigunawan/mala/pkg/database"
 )
 
@@ -25,7 +26,11 @@ func GetKeyUsageHistory(c *fiber.Ctx) error {
 	keyID := c.Params("key_id")
 	
 	rows, err := database.DB.Query(context.Background(),
-		"SELECT id, model_id, prompt_tokens, completion_tokens, total_cost, status_code, created_at FROM usage_logs WHERE virtual_key_id = $1 ORDER BY created_at DESC LIMIT 100",
+		`SELECT id, virtual_key_id, model_id, prompt_tokens, completion_tokens, total_cost, latency_ms, status_code, created_at 
+		 FROM usage_logs 
+		 WHERE virtual_key_id = $1 
+		 ORDER BY created_at DESC 
+		 LIMIT 100`,
 		keyID,
 	)
 	if err != nil {
@@ -33,21 +38,13 @@ func GetKeyUsageHistory(c *fiber.Ctx) error {
 	}
 	defer rows.Close()
 
-	type LogEntry struct {
-		ID               int64   `json:"id"`
-		ModelID          string  `json:"model_id"`
-		PromptTokens     int     `json:"prompt_tokens"`
-		CompletionTokens int     `json:"completion_tokens"`
-		TotalCost        float64 `json:"total_cost"`
-		StatusCode       int     `json:"status_code"`
-		CreatedAt        string  `json:"created_at"`
-	}
-
-	logs := []LogEntry{}
+	logs := []models.UsageLog{}
 	for rows.Next() {
-		var l LogEntry
-		var createdAt interface{} // Handle timestamp
-		rows.Scan(&l.ID, &l.ModelID, &l.PromptTokens, &l.CompletionTokens, &l.TotalCost, &l.StatusCode, &createdAt)
+		var l models.UsageLog
+		err := rows.Scan(&l.ID, &l.VirtualKeyID, &l.ModelID, &l.PromptTokens, &l.CompletionTokens, &l.TotalCost, &l.LatencyMS, &l.StatusCode, &l.CreatedAt)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
 		logs = append(logs, l)
 	}
 

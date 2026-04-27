@@ -7,6 +7,9 @@ build:
 tidy:
 	go mod tidy
 
+# migrate:
+# 	go 
+
 test:
 	go test ./...
 

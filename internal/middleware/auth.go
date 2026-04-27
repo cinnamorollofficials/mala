@@ -8,7 +8,7 @@ import (
 	"github.com/hadigunawan/mala/pkg/database"
 )
 
-func VirtualKeyMiddleware(c *fiber.Ctx) error {
+func VirtualKeyAuth(c *fiber.Ctx) error {
 	authHeader := c.Get("Authorization")
 	if authHeader == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -16,7 +16,6 @@ func VirtualKeyMiddleware(c *fiber.Ctx) error {
 		})
 	}
 
-	// Format: Bearer sk-gh-...
 	parts := strings.Split(authHeader, " ")
 	if len(parts) != 2 || parts[0] != "Bearer" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -48,14 +47,10 @@ func VirtualKeyMiddleware(c *fiber.Ctx) error {
 		})
 	}
 
-	if totalBudget > 0 && spentAmount >= totalBudget {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error": "Budget exceeded for this Virtual Key",
-		})
-	}
-
-	// Store virtual key info in context for later use
+	// Store metadata in Locals
 	c.Locals("virtual_key_id", id)
+	c.Locals("budget_remaining", totalBudget-spentAmount)
+	c.Locals("total_budget", totalBudget)
 
 	return c.Next()
 }

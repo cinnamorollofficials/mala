@@ -7,9 +7,6 @@ build:
 tidy:
 	go mod tidy
 
-# migrate:
-# 	go 
-
 test:
 	go test ./...
 
@@ -18,3 +15,16 @@ clean:
 
 perf-test:
 	go run scripts/perf_test.go
+
+# Docker commands
+docker-up:
+	docker compose up -d
+
+docker-down:
+	docker compose down
+
+docker-logs:
+	docker compose logs -f
+
+docker-build:
+	docker compose build

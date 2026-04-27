@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: mala-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-hadigunawan}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-mala_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations/000001_init_schema.up.sql:/docker-entrypoint-initdb.d/000001_init_schema.up.sql
+
+  app:
+    build: .
+    container_name: mala-app
+    restart: always
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-hadigunawan}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-mala_db}
+      DB_SSLMODE: disable
+      PORT: 3000
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-a-very-secret-key-32-chars-long!}
+      ALLOWED_IPS: "*" # In docker, IP might change, adjust as needed
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

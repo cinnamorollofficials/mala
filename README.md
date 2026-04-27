@@ -146,5 +146,23 @@ make build
 make perf-test
 ```
 
+## Docker Deployment
+
+You can also run the entire stack (App + Postgres) using Docker Compose:
+
+```bash
+# Start the stack
+make docker-up
+
+# View logs
+make docker-logs
+
+# Stop the stack
+make docker-down
+```
+
+> [!TIP]
+> On the first run, Docker will automatically execute the database migrations found in `database/migrations/`.
+
 ## License
 [MIT](LICENSE)
